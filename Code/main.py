@@ -48,7 +48,7 @@ def main():
     df = pd.read_csv('../Documents/tcc_ceds_music.csv')
     df.drop_duplicates(subset=['track_name'], keep='first', inplace=True)
     print(df.columns)
-    x = df.genere
+    # x = df.genere
     print(x)
 
 
