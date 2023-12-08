@@ -1,6 +1,12 @@
 import pandas as pd
+from dotenv import load_dotenv
+import os
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
+
+load_dotenv()
+
+SPOTIFY_DATA = os.getenv('SPOTIFY_DATA')
 
 spotify = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials('798c070d2d5e4ab98b36353e469dba19',
                                                                               'ec5f36a15c864212a84ab03d15fc7c74'))
@@ -50,6 +56,11 @@ def main():
     print(df.columns)
     # x = df.genere
     print(x)
+
+    # Konrad --- testing if .env variables work, they do :)
+    #               make sure your path variables are good if you run into any errors
+    df_spotify = pd.read_csv(SPOTIFY_DATA)
+    print(df_spotify.head(10))
 
 
 ''' Testing spotify api, works so far
