@@ -6,6 +6,18 @@ import spotipy
 from sklearn.manifold import TSNE
 from spotipy.oauth2 import SpotifyClientCredentials
 import matplotlib.pyplot as plt
+import plotly.express as px
+
+import nltk
+from nltk.corpus import stopwords
+from nltk import word_tokenize
+from nltk.stem import PorterStemmer
+from nltk.stem import WordNetLemmatizer
+from nltk.corpus import wordnet
+
+import string
+import re
+
 
 load_dotenv()
 SPOTIFY_DATA = os.getenv('SPOTIFY_DATA')
@@ -85,6 +97,32 @@ def main():
     print_info(track)
     '''
 
+    # Preprocessing the lyrics
+
+    lyrics_df = pd.read_csv(DATASET)
+    lyrics_df = lyrics_df.iloc[:, [0, 6]] 
+
+    # checked the data and there are no nulls or duplicates
+
+    # print(len(lyrics_df))
+    # print(lyrics_df.isnull().sum())
+    # print(lyrics_df)
+    # print(lyrics_df.duplicated().sum())
+
+    lyrics_df.drop_duplicates(inplace=True)
+    lyrics_df.dropna(inplace=True) # just in case
+    
+    def pipline(somestring):
+
+        return somestring
+
+
+
+
+
+
+    #
+
     # to have more data going to assign numbers to genre data
     genres = df['genre'].unique()  # need to assign unique elements in genre column a number for analysis later
     # print(genres)
@@ -114,6 +152,9 @@ def main():
     plt.figure()
     plt.scatter(tsne_data[:, 0], tsne_data[:, 1],alpha=1.0)
     plt.show()
+
+    # plot = px.scatter(tsne_data[:, 0], tsne_data[:, 1])
+    # plot.show()
 
 
 if __name__ == '__main__':
