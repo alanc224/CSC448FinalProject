@@ -6,6 +6,17 @@ import spotipy
 from sklearn.manifold import TSNE
 from spotipy.oauth2 import SpotifyClientCredentials
 import matplotlib.pyplot as plt
+import plotly.express as px
+
+import nltk
+from nltk import word_tokenize
+from nltk.stem import PorterStemmer
+from nltk.stem import WordNetLemmatizer
+from nltk.corpus import wordnet
+
+import string
+import re
+
 
 # Konrad -- Make sure .env variables have the same name
 load_dotenv()
@@ -88,6 +99,41 @@ def main():
     print_info(track)
     '''
 
+# Preprocessing the lyrics
+
+    lyrics_df = pd.read_csv(TCC_DATA)
+    lyrics_df = lyrics_df.iloc[:, [0,1,2,3,4,5,6]] 
+
+    # checked the data and there are no nulls or duplicates
+
+    # print(len(lyrics_df))
+    # print(lyrics_df.isnull().sum())
+    # print(lyrics_df)
+    # print(lyrics_df.duplicated().sum())
+
+    lyrics_df.drop_duplicates(inplace=True)
+    lyrics_df.dropna(inplace=True) # just in case
+    
+    def pipline(somestring):
+
+        somestring = somestring.lower() #make lowercase
+        somestring = re.sub(r'[^\w\s]','',somestring) #remove punctuation
+        new_string=re.sub('[^a-zA-Z0-9]',' ',somestring) # takes only alphanumeric values
+        somestring=re.sub('\s+',' ',new_string) # removes extra characters like extra spaces
+
+        return somestring
+    
+    print(lyrics_df.columns)
+
+    lyrics_df['cleaned'] = lyrics_df['lyrics'].apply(pipline)
+
+    print(lyrics_df['cleaned'][0])
+
+
+
+
+#
+
     # to have more data going to assign numbers to genre data
     genres = df['genre'].unique()  # need to assign unique elements in genre column a number for analysis later
     # print(genres)
@@ -117,6 +163,9 @@ def main():
     plt.figure()
     plt.scatter(tsne_data[:, 0], tsne_data[:, 1],alpha=1.0)
     plt.show()
+
+    # plot = px.scatter(tsne_data[:, 0], tsne_data[:, 1])
+    # plot.show()
 
 
 if __name__ == '__main__':
