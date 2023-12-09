@@ -1,3 +1,4 @@
 .env
 venv
 448env
+.DS_Store
