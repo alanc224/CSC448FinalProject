@@ -19,11 +19,13 @@ import re
 
 
 load_dotenv()
+SPOTIFY_KEY1 = os.getenv('SPOTIFY_KEY1')
+SPOTIFY_KEY2 = os.getenv('SPOTIFY_KEY2')
 SPOTIFY_DATA = os.getenv('SPOTIFY_DATA')
-DATASET = os.getenv('df')
+TCC_DATA = os.getenv('TCC_DATA')
 
-spotify = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials('798c070d2d5e4ab98b36353e469dba19',
-                                                                              'ec5f36a15c864212a84ab03d15fc7c74'))
+spotify = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials(SPOTIFY_KEY1,
+                                                                              SPOTIFY_KEY2))
 
 
 def getid(artist_name, song_name):
@@ -65,7 +67,7 @@ def print_info(track):
 
 
 def main():
-    df = pd.read_csv(DATASET)
+    df = pd.read_csv(TCC_DATA)
     df.drop_duplicates(subset=['track_name'], keep='first', inplace=True)
     df.drop(columns=['release_date', 'lyrics'], axis=1, inplace=True)
     # print(df.columns)
@@ -98,7 +100,7 @@ def main():
 
 # Preprocessing the lyrics
 
-    lyrics_df = pd.read_csv(DATASET)
+    lyrics_df = pd.read_csv(TCC_DATA)
     lyrics_df = lyrics_df.iloc[:, [0, 6]] 
 
     # checked the data and there are no nulls or duplicates
