@@ -9,7 +9,6 @@ import matplotlib.pyplot as plt
 import plotly.express as px
 
 import nltk
-from nltk.corpus import stopwords
 from nltk import word_tokenize
 from nltk.stem import PorterStemmer
 from nltk.stem import WordNetLemmatizer
@@ -97,7 +96,7 @@ def main():
     print_info(track)
     '''
 
-    # Preprocessing the lyrics
+# Preprocessing the lyrics
 
     lyrics_df = pd.read_csv(DATASET)
     lyrics_df = lyrics_df.iloc[:, [0, 6]] 
@@ -114,14 +113,19 @@ def main():
     
     def pipline(somestring):
 
+        somestring = somestring.lower() #make lowercase
+        somestring = re.sub(r'[^\w\s]','',somestring) #remove punctuation
+        new_string=re.sub('[^a-zA-Z0-9]',' ',somestring) # takes only alphanumeric values
+        somestring=re.sub('\s+',' ',new_string) # removes extra characters like extra spaces
+
         return somestring
 
+    lyrics_df['cleaned'] = lyrics_df['lyrics'].apply(pipline)
 
 
 
 
-
-    #
+#
 
     # to have more data going to assign numbers to genre data
     genres = df['genre'].unique()  # need to assign unique elements in genre column a number for analysis later
