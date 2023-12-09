@@ -101,7 +101,7 @@ def main():
 # Preprocessing the lyrics
 
     lyrics_df = pd.read_csv(TCC_DATA)
-    lyrics_df = lyrics_df.iloc[:, [0, 6]] 
+    lyrics_df = lyrics_df.iloc[:, [0,1,2,3,4,5,6]] 
 
     # checked the data and there are no nulls or duplicates
 
@@ -121,8 +121,12 @@ def main():
         somestring=re.sub('\s+',' ',new_string) # removes extra characters like extra spaces
 
         return somestring
+    
+    print(lyrics_df.columns)
 
     lyrics_df['cleaned'] = lyrics_df['lyrics'].apply(pipline)
+
+    print(lyrics_df['cleaned'][0])
 
 
 
