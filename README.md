@@ -2,7 +2,7 @@
 # Music Recommendation Model
 Descripton here, Maybe include slides here
 # Group 4 (TBD)
-[Alan Concepcion](./Code/Alan%20Concepcion/) 
+[Alan Concepcion](./Code/Alan_Concepcion/) 
 # Installaton
 Link to txt files and brief description
 # Implementation
