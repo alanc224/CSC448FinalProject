@@ -4,7 +4,9 @@ Descripton here, Maybe include slides here
 # Group 4 (TBD)
 [Alan Concepcion](./Code/Alan_Concepcion/) 
 # Installaton
-Link to txt files and brief description
+[Requirements](requirements.txt)
+[Instructions](instructions.txt)
+Need brief description
 # Implementation
 Describe how we are implementing models here
 # Resources 
