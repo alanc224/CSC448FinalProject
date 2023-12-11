@@ -2,7 +2,7 @@
 # Music Recommendation Model
 Descripton here, Maybe include slides here
 # Group 4 (TBD)
-Insert members here, link to individual code folders next to names 
+[Alan Concepcion](./Code/Alan%20Concepcion/) 
 # Installaton
 Link to txt files and brief description
 # Implementation
