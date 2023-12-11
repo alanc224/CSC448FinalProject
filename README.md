@@ -6,6 +6,8 @@ We are creating an interactive music recommendation model which is capable of ta
 
 The current restrictions we face in terms of functionality is that the model will only work if the inputted song also has an entry in the datasets we use, as that way we will have its characteristics labeled numerically, which we can then compare to other songs in the dataset to detect similarities. One way we can potentially help rectify this is by implementing a model which can detect similarity between text, so that if a user inputs a song name that is not recognized in the dataset, we can query the user to pick from a set of songs that have a similar name to see if they inputted the name incorrectly.
 
+Additionally, we could also potentially use the Spotify API to collect the relavant audio features we need of an inputted song, and using that as input instead of depending on the inputted song already existing in the dataset entries.
+
 <p align="center">
     <details>
         <summary>Presentation Slides</summary>
