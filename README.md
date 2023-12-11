@@ -28,16 +28,16 @@ Additionally, we could also potentially use the Spotify API to collect the relav
 [Anthony Zhu](./Code/Anthony_Zhu/)  
 [Daphne Tang](./Code/Daphne_Tang/)  
 # Installaton
-[Requirements](requirements.txt) - includes all of the packages used + versions
+Need brief description  
+[Requirements](requirements.txt) - includes all of the packages used + versions  
 [Instructions](instructions.txt) - includes instructions for setting up various parts of the project
-Need brief description
 # Implementation
 Describe how we are implementing models here
 # Resources 
 Credit any resources here
 
-[tcc_ceds_music.csv Link](https://www.kaggle.com/datasets/saurabhshahane/music-dataset-1950-to-2019)
-[Spotify Dataset Link](https://www.kaggle.com/datasets/vatsalmavani/spotify-dataset/data)
+[Music Dataset : 1950 to 2019 posted by Saurabh Shahane](https://www.kaggle.com/datasets/saurabhshahane/music-dataset-1950-to-2019)  
+[Spotify dataset posted by Vastal Mavani](https://www.kaggle.com/datasets/vatsalmavani/spotify-dataset/data)
 
 
 
