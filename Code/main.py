@@ -25,8 +25,7 @@ SPOTIFY_KEY2 = os.getenv('SPOTIFY_KEY2')
 SPOTIFY_DATA = os.getenv('SPOTIFY_DATA')
 TCC_DATA = os.getenv('TCC_DATA')
 
-spotify = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials(SPOTIFY_KEY1,
-                                                                              SPOTIFY_KEY2))
+spotify = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials(SPOTIFY_KEY1,SPOTIFY_KEY2))
 
 
 def getid(artist_name, song_name):
@@ -70,7 +69,7 @@ def print_info(track):
 def main():
     df = pd.read_csv(TCC_DATA)
     df.drop_duplicates(subset=['track_name'], keep='first', inplace=True)
-    df.drop(columns=['release_date', 'lyrics'], axis=1, inplace=True)
+    df.drop(columns=['lyrics'], axis=1, inplace=True)
     # print(df.columns)
 
     ''' Konrad --- testing if .env variables work, they do :)
@@ -98,6 +97,7 @@ def main():
     track = spotify.track(track_id)
     print_info(track)
     '''
+    
 
 # Preprocessing the lyrics
 
@@ -158,14 +158,20 @@ def main():
     # print(df_relevant_columns.columns)
     # print(df_relevant_columns)
 
-    tsne = TSNE(n_components=2, verbose=1, perplexity=40, n_iter=500)
-    tsne_data = tsne.fit_transform(df_relevant_columns.sample(n=500))
-    plt.figure()
-    plt.scatter(tsne_data[:, 0], tsne_data[:, 1],alpha=1.0)
-    plt.show()
+    # Checking the aesthtic by decade
+    Year_df = df_relevant_columns.drop(columns=['Unnamed: 0', 'genre_mapping', 'topic_mapping', 'age'], axis=1)
+    Year_1950_1960s_df = Year_df[(df['release_date'] >= 1950) & (df['release_date'] <= 1960)] # need to do this until 2010....
+    aggregateYear = Year_1950_1960s_df.groupby('release_date', as_index=False).mean(numeric_only=True)
+    aestheticYear = px.bar(aggregateYear, x="release_date", y=Year_1950_1960s_df.columns ,barmode='group')
+    aestheticYear.show()
 
-    # plot = px.scatter(tsne_data[:, 0], tsne_data[:, 1])
-    # plot.show()
+    # Checking the aesthtic by year
+    genre_df = df_relevant_columns.drop(columns=['Unnamed: 0', 'genre_mapping', 'topic_mapping', 'age', 'release_date'], axis=1)
+    aggregate = df.groupby('genre', as_index=False).mean(numeric_only=True) # way too much data, so aggregate and get mean or use sample and choose a small random subset
+    aesthetic = px.bar(aggregate, x="genre", y=genre_df.columns ,barmode='group')
+    aesthetic.show()
+
+    
 
 
 if __name__ == '__main__':
