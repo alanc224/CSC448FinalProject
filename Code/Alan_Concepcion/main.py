@@ -1,28 +1,20 @@
 import numpy as np
 import pandas as pd
+import string
 from dotenv import load_dotenv
 import os
 from sklearn.metrics import accuracy_score
 from sklearn.decomposition import PCA
 from sklearn.model_selection import cross_val_score, train_test_split
-from sklearn.neighbors import NearestNeighbors, KNeighborsClassifier
+from sklearn.neighbors import NearestNeighbors, KNeighborsClassifier,KNeighborsRegressor
 from sklearn.manifold import TSNE
 from factor_analyzer import calculate_bartlett_sphericity, calculate_kmo, FactorAnalyzer
 import spotipy
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import StandardScaler, MinMaxScaler, MaxAbsScaler
 from spotipy.oauth2 import SpotifyClientCredentials
 import matplotlib.pyplot as plt
 import plotly.express as px
 import seaborn as sns
-
-import nltk
-from nltk import word_tokenize
-from nltk.stem import PorterStemmer
-from nltk.stem import WordNetLemmatizer
-from nltk.corpus import wordnet
-
-import string
-import re
 
 # Konrad -- Make sure .env variables have the same name
 load_dotenv()
@@ -35,61 +27,29 @@ spotify = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials(SP
 
 
 def nn_model(df,df_relevant_columns,artist_name,song_name):
-        scaler = StandardScaler()
+        scaler = MaxAbsScaler()
         artistname = "['{}']".format(artist_name)
+        X = scaler.fit_transform(df_relevant_columns)
 
-        X = df_relevant_columns.drop('popularity', axis = 1)
-        y = df_relevant_columns['popularity']
+        k = NearestNeighbors(n_neighbors=5, metric='cosine', algorithm='brute')
+        k.fit(X)
 
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
-        # Scale the features using StandardScaler
-        X_train = scaler.fit_transform(X_train)
-        X_test = scaler.transform(X_test)
-
-        # find optimal k
-        print("Finding optimal k...")
-        k_values = [i for i in range (1,12)]
-        scores = []
-        X = scaler.fit_transform(X)
-
-        for k in k_values:
-            print("im here",k)
-            knn = KNeighborsClassifier(n_neighbors=k)
-            score = cross_val_score(knn, X, y, cv=5)
-            scores.append(np.mean(score))
-        
-        sns.lineplot(x = k_values, y = scores, marker = 'o')
-        plt.xlabel("K Values")
-        plt.ylabel("Accuracy Score")
-        print("Done...")
-
-        k = KNeighborsClassifier(n_neighbors=3)
-        print("Fitting data...")
-        k.fit(X_train,y_train)
-        y_pred = k.predict(X_test)
-        print("Done")
-
-        accuracy = accuracy_score(y_test, y_pred)
-        print("Accuracy:", accuracy)
-
-        '''# Getting values from input song, and attempting to train model
+        # Extract features for the input song
         input_song_details = df[(df['name'] == song_name) & (df['artists'] == artistname)][df_relevant_columns.columns]
         input_song_aesthetic = scaler.transform(input_song_details)
-        print(input_song_details) # sanity check
-        # print(input_song_aesthetic)
+        print(input_song_details) # Sanity check
+        print(input_song_aesthetic)
 
+        scaler.fit_transform(df_relevant_columns)
         distance, indices = k.kneighbors(input_song_aesthetic)
-        recommended_songs = df.iloc[indices.flatten()][['artists', 'name']].iloc[1:][:5]
-'''
-        
+        recommended_songs = df.iloc[indices.flatten()][['artists', 'name']]
 
-        return 0
-
+        return recommended_songs
 
 
 def getid(artist_name, song_name):
     artistname = artist_name.strip("['']")
-    results = spotify.search(q="track" + song_name + "artist" + artistname, type="track", limit=1)
+    results = spotify.search(q="track" + song_name + "artists" + artistname, type="track", limit=1)
     if "tracks" in results and "items" in results["tracks"]:
         return results["tracks"]["items"][0]["id"]
     else:
@@ -132,20 +92,8 @@ def print_info(track):
 
 def main():
     df_spotify = pd.read_csv(SPOTIFY_DATA)
-    '''df_spotify.drop_duplicates(subset=None, inplace=True)
-    dupes = df_spotify[(df_spotify['name'].str.contains('Neon')) & (df_spotify['artists'].str.contains('John Mayer'))]
-    print(dupes[['name', 'artists']])'''
-    # need to drop dupes of same songs but contain extra words as seen in example above
-
-    '''print(df_spotify.head())
-    print(df_spotify.shape)'''
-
-    ''' Konrad --- testing if .env variables work, they do :)
-    #               make sure your path variables are good if you run into any errors
-    df_spotify = pd.read_csv(SPOTIFY_DATA)
-    print(df_spotify.head(10))
-    print(df_spotify.columns)
-    '''
+    df_spotify.dropna()
+    df_spotify.drop_duplicates()
 
     # Testing spotify api, works so far
     found = False
@@ -166,42 +114,9 @@ def main():
     track = spotify.track(track_id)
     print_info(track)
 
-# Preprocessing the lyrics
-    '''
-    lyrics_df = pd.read_csv(TCC_DATA)
-    lyrics_df = lyrics_df.iloc[:, [0,1,2,3,4,5,6]] 
-
-    # checked the data and there are no nulls or duplicates
-
-    # print(len(lyrics_df))
-    # print(lyrics_df.isnull().sum())
-    # print(lyrics_df)
-    # print(lyrics_df.duplicated().sum())
-
-    lyrics_df.drop_duplicates(inplace=True)
-    lyrics_df.dropna(inplace=True) # just in case
-    
-    def pipline(somestring):
-
-        somestring = somestring.lower() #make lowercase
-        somestring = re.sub(r'[^\w\s]','',somestring) #remove punctuation
-        new_string=re.sub('[^a-zA-Z0-9]',' ',somestring) # takes only alphanumeric values
-        somestring=re.sub('\s+',' ',new_string) # removes extra characters like extra spaces
-
-        return somestring
-    
-    print(lyrics_df.columns)
-
-    lyrics_df['cleaned'] = lyrics_df['lyrics'].apply(pipline)
-
-    print(lyrics_df['cleaned'][0])
-'''
-
-#
-    
     # Using content based filtering
     # making new dataframe with relevant columns
-    df_relevant_columns = df_spotify.drop(columns=['id','name','release_date','artists'], axis=1)
+    df_relevant_columns = df_spotify.drop(columns=['id','name','release_date','artists','mode'], axis=1)
     df_relevant_columns.dropna(inplace=True)
     chi_square_value,p_value=calculate_bartlett_sphericity(df_relevant_columns)
     print(chi_square_value, p_value)
