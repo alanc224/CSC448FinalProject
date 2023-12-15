@@ -2,8 +2,10 @@ import numpy as np
 import pandas as pd
 from dotenv import load_dotenv
 import os
-import spotipy
+from sklearn.neighbors import NearestNeighbors
 from sklearn.manifold import TSNE
+import spotipy
+from sklearn.preprocessing import StandardScaler
 from spotipy.oauth2 import SpotifyClientCredentials
 import matplotlib.pyplot as plt
 import plotly.express as px
@@ -17,21 +19,40 @@ from nltk.corpus import wordnet
 import string
 import re
 
-
+# Konrad -- Make sure .env variables have the same name
 load_dotenv()
 SPOTIFY_KEY1 = os.getenv('SPOTIFY_KEY1')
 SPOTIFY_KEY2 = os.getenv('SPOTIFY_KEY2')
 SPOTIFY_DATA = os.getenv('SPOTIFY_DATA')
 TCC_DATA = os.getenv('TCC_DATA')
 
-spotify = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials(SPOTIFY_KEY1,
-                                                                              SPOTIFY_KEY2))
+spotify = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials(SPOTIFY_KEY1,SPOTIFY_KEY2))
+
+def nn_model(df,df_relevant_columns,artist_name,song_name):
+        scaler =  StandardScaler(with_mean=True,with_std=True)
+        scaled_features = scaler.fit_transform(df_relevant_columns)
+
+        k = NearestNeighbors(n_neighbors=15, metric='cosine',algorithm='brute')  
+        k.fit(scaled_features)
+        
+        # Getting values from input song, and attempting to train model
+        input_song_details = df[(df['name'] == song_name) & (df['artists'] == artist_name)][df_relevant_columns.columns]
+        input_song_aesthetic = scaler.transform(input_song_details)
+        '''print(input_song_details) # sanity check
+        print(input_song_aesthetic)'''
+        distance, indices = k.kneighbors(input_song_aesthetic)
+        nearest_neighbors = indices.flatten()
+        recommended_songs = df.iloc[nearest_neighbors][['artists', 'name']][:-1][:5]
+
+        return recommended_songs
+
 
 
 def getid(artist_name, song_name):
-    results = spotify.search(q="track" + song_name + "artist:" + artist_name, type="track", limit=1)
-
-    if "tracks" in results and "items" in results["tracks"]:
+    artistname = artist_name.strip("['']")
+    results = spotify.search(q="artist" + artistname + "track" + song_name, type="track", limit=1)
+    SPOTIFY_ARTIST = results["tracks"]["items"][0]['artists'][0]['name']
+    if "tracks" in results and "items" in results["tracks"] and SPOTIFY_ARTIST == artistname:
         return results["tracks"]["items"][0]["id"]
     else:
         print("Track not found.")
@@ -39,20 +60,21 @@ def getid(artist_name, song_name):
 
 
 def name_lookup(name, df):
-    lookup = df[df['artist_name'].str.lower() == name.lower()]
+    formatting_input = "['{}']".format(string.capwords(name))
+    lookup = df[df['artists'].str.lower() == formatting_input.lower()]
 
     if not lookup.empty:
-        return name
+        return formatting_input
     else:
         print("Artist not found")
         return False
 
 
 def song_lookup(song, df):
-    lookup = df[df['track_name'].str.lower() == song.lower()]
+    lookup = df[df['name'].str.lower() == song.lower()]
 
     if not lookup.empty:
-        return song
+        return string.capwords(song)
     else:
         print("Song not found.")
         return False
@@ -67,10 +89,12 @@ def print_info(track):
 
 
 def main():
-    df = pd.read_csv(TCC_DATA)
-    df.drop_duplicates(subset=['track_name'], keep='first', inplace=True)
-    df.drop(columns=['release_date', 'lyrics'], axis=1, inplace=True)
-    # print(df.columns)
+    df_spotify = pd.read_csv(SPOTIFY_DATA)
+
+    dupes = df_spotify[
+    (df_spotify['name'].str.contains('Neon')) & (df_spotify['artists'].str.contains('John Mayer'))]
+    print(dupes[['name', 'artists']])
+    # need to drop dupes of same songs but contain extra words as seen in example above
 
     ''' Konrad --- testing if .env variables work, they do :)
     #               make sure your path variables are good if you run into any errors
@@ -79,87 +103,48 @@ def main():
     print(df_spotify.columns)
     '''
 
-    '''Testing spotify api, works so far
+    # Testing spotify api, works so far
     found = False
     while not found:
         artist_name = input("Enter artist name: ")
-        if name_lookup(artist_name, df):
+        if name_lookup(artist_name, df_spotify):
             found = True
+            artist_name=name_lookup(artist_name,df_spotify)
 
     found = False
     while not found:
         song_name = input("Enter song name: ")
-        if song_lookup(song_name, df):
+        if song_lookup(song_name, df_spotify):
             found = True
+            song_name = song_lookup(song_name, df_spotify)
 
     track_id = getid(artist_name, song_name)
-
     track = spotify.track(track_id)
     print_info(track)
-    '''
 
-# Preprocessing the lyrics
 
-    lyrics_df = pd.read_csv(TCC_DATA)
-    lyrics_df = lyrics_df.iloc[:, [0,1,2,5,6]] 
-    print(lyrics_df.columns)
-
-    # checked the data and there are no nulls or duplicates
-
-    # print(len(lyrics_df))
-    # print(lyrics_df.isnull().sum())
-    # print(lyrics_df)
-    # print(lyrics_df.duplicated().sum())
-
-    lyrics_df.drop_duplicates(inplace=True)
-    lyrics_df.dropna(inplace=True) # just in case
-    
-    def pipline(somestring):
-
-        somestring = somestring.lower() #make lowercase
-        somestring = re.sub(r'[^\w\s]','',somestring) #remove punctuation
-        new_string=re.sub('[^a-zA-Z0-9]',' ',somestring) # takes only alphanumeric values
-        somestring=re.sub('\s+',' ',new_string) # removes extra characters like extra spaces
-
-        return somestring
-
-    lyrics_df['cleaned'] = lyrics_df['lyrics'].apply(pipline)
-
-    # print(lyrics_df['cleaned'][0])
-    #
-
-    # to have more data going to assign numbers to genre data
-    genres = df['genre'].unique()  # need to assign unique elements in genre column a number for analysis later
-    # print(genres)
-    # mapping genres for kmeans later
-    genre_mapping = {'pop': 1, 'country': 2, 'blues': 3, 'rock': 4, 'jazz': 5, 'reggae': 6, 'hip hop': 7}
-    df['genre_mapping'] = df['genre'].map(genre_mapping)
-    # print(df.columns)
-    # print(df['genre_mapping'])
-
-    # now to do the same with topic column
-    topics = df['topic'].unique()  # need to assign unique elements in genre column a number for analysis later
-    # print(topics)
-    # mapping topics for kmeans later
-    topic_mapping = {'sadness': 1, 'world/life': 2, 'music': 3, 'romantic': 4, 'violence': 5, 'obscene': 6,
-                     'night/time': 7, 'feelings': 8}
-    df['topic_mapping'] = df['topic'].map(topic_mapping)
-    # print(df.columns)
-    # print(df['topic_mapping'])
-
+    # Using content based filtering
     # making new dataframe with relevant columns
-    df_relevant_columns = df.drop(columns=['artist_name', 'track_name', 'len', 'genre', 'topic'], axis=1)
-    # print(df_relevant_columns.columns)
-    # print(df_relevant_columns)
-
-    tsne = TSNE(n_components=2, verbose=1, perplexity=40, n_iter=500)
-    tsne_data = tsne.fit_transform(df_relevant_columns.sample(n=500))
-    plt.figure()
-    plt.scatter(tsne_data[:, 0], tsne_data[:, 1],alpha=1.0)
+    df_relevant_columns = df_spotify.drop(columns=['id','name','release_date','artists'], axis=1)
+    print(df_relevant_columns.columns) # sanity check
+    # creating a subset to use for T- Distributed Stochastic Neighbor Embedding
+    df_subset = df_relevant_columns.sample(500, random_state=42) # just 500 points of data for now
+    scaler = StandardScaler()
+    df_scaled = scaler.fit_transform(df_subset)
+    tsne = TSNE(n_components=2, random_state=42)
+    df_spotify_tsne = tsne.fit_transform(df_scaled)
+    plt.scatter(df_spotify_tsne[:, 0], df_spotify_tsne[:, 1], c=df_subset['energy'], cmap='magma') #dist. of column enegry with the random 500 points of data
+    plt.title('TSNE')
     plt.show()
 
-    # plot = px.scatter(tsne_data[:, 0], tsne_data[:, 1])
-    # plot.show()
+    '''year_df = df_spotify.drop(columns=['id','name','release_date','artists','mode','explicit','duration_ms','tempo','key','popularity'], axis=1)
+    aggregate = df_spotify.groupby('year', as_index=False).mean(numeric_only=True) # way too much data, so aggregate and get mean or use sample and choose a small random subset
+    aesthetic = px.bar(aggregate, x="year", y=year_df.columns ,barmode='group')
+    aesthetic.show()'''
+
+    print(nn_model(df_spotify,df_relevant_columns,artist_name,track['name'])) # using track['name'] as a lazy fix for songs like "the arms of sorrow" -> "The Arms of Sorrow"
+
+    
 
 
 if __name__ == '__main__':
