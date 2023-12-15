@@ -28,26 +28,6 @@ TCC_DATA = os.getenv('TCC_DATA')
 
 spotify = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials(SPOTIFY_KEY1,SPOTIFY_KEY2))
 
-def nn_model(df,df_relevant_columns,artist_name,song_name):
-        scaler =  StandardScaler(with_mean=True,with_std=True)
-        scaled_features = scaler.fit_transform(df_relevant_columns)
-
-        k = NearestNeighbors(n_neighbors=15, metric='cosine',algorithm='brute')  
-        k.fit(scaled_features)
-        
-        # Getting values from input song, and attempting to train model
-        input_song_details = df[(df['name'] == song_name) & (df['artists'] == artist_name)][df_relevant_columns.columns]
-        input_song_aesthetic = scaler.transform(input_song_details)
-        '''print(input_song_details) # sanity check
-        print(input_song_aesthetic)'''
-        distance, indices = k.kneighbors(input_song_aesthetic)
-        nearest_neighbors = indices.flatten()
-        recommended_songs = df.iloc[nearest_neighbors][['artists', 'name']][:-1][:5]
-
-        return recommended_songs
-
-
-
 def getid(artist_name, song_name):
     artistname = artist_name.strip("['']")
     results = spotify.search(q="artist" + artistname + "track" + song_name, type="track", limit=1)
@@ -123,26 +103,6 @@ def main():
     print_info(track)
 
 
-    # Using content based filtering
-    # making new dataframe with relevant columns
-    df_relevant_columns = df_spotify.drop(columns=['id','name','release_date','artists'], axis=1)
-    print(df_relevant_columns.columns) # sanity check
-    # creating a subset to use for T- Distributed Stochastic Neighbor Embedding
-    df_subset = df_relevant_columns.sample(500, random_state=42) # just 500 points of data for now
-    scaler = StandardScaler()
-    df_scaled = scaler.fit_transform(df_subset)
-    tsne = TSNE(n_components=2, random_state=42)
-    df_spotify_tsne = tsne.fit_transform(df_scaled)
-    plt.scatter(df_spotify_tsne[:, 0], df_spotify_tsne[:, 1], c=df_subset['energy'], cmap='magma') #dist. of column enegry with the random 500 points of data
-    plt.title('TSNE')
-    plt.show()
-
-    '''year_df = df_spotify.drop(columns=['id','name','release_date','artists','mode','explicit','duration_ms','tempo','key','popularity'], axis=1)
-    aggregate = df_spotify.groupby('year', as_index=False).mean(numeric_only=True) # way too much data, so aggregate and get mean or use sample and choose a small random subset
-    aesthetic = px.bar(aggregate, x="year", y=year_df.columns ,barmode='group')
-    aesthetic.show()'''
-
-    print(nn_model(df_spotify,df_relevant_columns,artist_name,track['name'])) # using track['name'] as a lazy fix for songs like "the arms of sorrow" -> "The Arms of Sorrow"
 
     
 
