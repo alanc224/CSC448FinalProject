@@ -122,39 +122,7 @@ def main():
     track = spotify.track(track_id)
     print_info(track)
 
-# Preprocessing the lyrics
-    '''
-    lyrics_df = pd.read_csv(TCC_DATA)
-    lyrics_df = lyrics_df.iloc[:, [0,1,2,3,4,5,6]] 
 
-    # checked the data and there are no nulls or duplicates
-
-    # print(len(lyrics_df))
-    # print(lyrics_df.isnull().sum())
-    # print(lyrics_df)
-    # print(lyrics_df.duplicated().sum())
-
-    lyrics_df.drop_duplicates(inplace=True)
-    lyrics_df.dropna(inplace=True) # just in case
-    
-    def pipline(somestring):
-
-        somestring = somestring.lower() #make lowercase
-        somestring = re.sub(r'[^\w\s]','',somestring) #remove punctuation
-        new_string=re.sub('[^a-zA-Z0-9]',' ',somestring) # takes only alphanumeric values
-        somestring=re.sub('\s+',' ',new_string) # removes extra characters like extra spaces
-
-        return somestring
-    
-    print(lyrics_df.columns)
-
-    lyrics_df['cleaned'] = lyrics_df['lyrics'].apply(pipline)
-
-    print(lyrics_df['cleaned'][0])
-'''
-
-#
-    
     # Using content based filtering
     # making new dataframe with relevant columns
     df_relevant_columns = df_spotify.drop(columns=['id','name','release_date','artists'], axis=1)
