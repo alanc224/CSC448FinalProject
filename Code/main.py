@@ -92,8 +92,7 @@ def main():
     df_spotify = pd.read_csv(SPOTIFY_DATA)
 
     dupes = df_spotify[
-    (df_spotify['name'].str.contains('Neon')) &
-    (df_spotify['artists'].str.contains('John Mayer'))]
+    (df_spotify['name'].str.contains('Neon')) & (df_spotify['artists'].str.contains('John Mayer'))]
     print(dupes[['name', 'artists']])
     # need to drop dupes of same songs but contain extra words as seen in example above
 
