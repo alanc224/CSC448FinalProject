@@ -14,24 +14,22 @@ spotify = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials(SP
 
 @app.route('/', methods=['GET','POST'])
 def req():
-    song_exists = False
+    URI_exists = False
 
     if request.method == 'POST':
-        song_exists = True
-        artist = request.form.get('artist')
-        song = request.form.get('song')
+        URI_exists = True
+        URI = request.form.get('URI')
 
-        print(artist)
-        print(song)
+        print(URI)
 
-        song_exists = True
-        track_id = getid(artist, song)
+        URI_exists = True
+        track_id = URI
 
         if track_id == None:
-            song_exists = False
+            URI_exists = False
             alert_user = "This combination of artist and song is not recognized :("
             return render_template('index.html', alert_user=alert_user, 
-                                            song_exists=song_exists)
+                                            URI_exists=URI_exists)
         
         track = spotify.track(track_id)
         print_info(track)
@@ -46,14 +44,14 @@ def req():
         audio_features_dict = spotify.audio_features(track_list)
         print(audio_features_dict)
 
-        return render_template('index.html', song_exists=song_exists,
+        return render_template('index.html', URI_exists=URI_exists,
                                             Cur_Artist=Cur_Artist,
                                             Cur_Track=Cur_Track,
                                             Cur_Album=Cur_Album,
                                             Cur_Audio_Preview=Cur_Audio_Preview,
                                             Cur_Cover_Art=Cur_Cover_Art)
     
-    return render_template('index.html', song_exists=song_exists)
+    return render_template('index.html', URI_exists=URI_exists)
 
 # Taken from Alan/main.py
 def getid(artist_name, song_name):
