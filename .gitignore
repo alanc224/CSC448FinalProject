@@ -2,3 +2,5 @@
 venv
 448env
 .DS_Store
+.cache
+Code/Anthony_Zhu/.cache
