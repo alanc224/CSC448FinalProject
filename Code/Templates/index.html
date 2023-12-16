@@ -23,13 +23,30 @@
         </div>
     {% else %}
         <div class="cur_input" role="cur_input">
-            <img src="{{Cur_Cover_Art}}" alt="Cover Art">
-            <h3>Track Name: {{Cur_Track}}</h3>
-            <p>Album Name:  {{Cur_Album}}</p>
-            <p>Artist Name:  {{Cur_Artist}}</p>
-            <p>
-                Audio Preview:  <a href="{{Cur_Audio_Preview}}">{{Cur_Audio_Preview}}</a>
+            <img src="{{Cur_Cover_Art}}" alt="Cover Art" width="100" height="100"> 
+            <h3 style="font-size: 10px">Track Name: {{Cur_Track}}</h3>
+            <p style="font-size: 10px">Album Name:  {{Cur_Album}}</p>
+            <p style="font-size: 10px">Artist Name:  {{Cur_Artist}}</p>
+            <p style="font-size: 10px">
+                Audio Preview:  <a href="{{Cur_Audio_Preview}}">Audio Preview</a>
             </p>
         </div>
+        {% for i, song_info in rec_songs.items() %}
+        <hr>
+            <div class="cur_input" role="cur_input">
+                <img src="{{song_info['cover art']}}" alt="Cover Art" width="100" height="100"> 
+                <h3 style="font-size: 10px">Track Name: {{ song_info['song'] }}</h3>
+                <p style="font-size: 10px">Album Name:  {{ song_info['album'] }}</p>
+                <p style="font-size: 10px">Artist Name:  {{ song_info['artists'] }}</p>
+                <p style="font-size: 10px">
+                    {% if song_info['audio preview'] %}
+                        Audio Preview:  <a href="{{ song_info['audio preview'] }}">Audio Preview</a>
+                    {% else %}
+                        No audio preview available
+                    {% endif %}
+                </p>
+            </div>
+        {% endfor %}
     {% endif %}
 </center>
+
