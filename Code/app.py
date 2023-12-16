@@ -1,5 +1,8 @@
+import os
 from flask import Flask, render_template, request
 from dotenv import load_dotenv
+import pandas as pd
+from main import nn_model
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 import string
@@ -10,6 +13,7 @@ app = Flask(__name__)
 load_dotenv()
 SPOTIFY_KEY1 = '798c070d2d5e4ab98b36353e469dba19' # To prevent the need for authentification, we will delete this once the semester is over
 SPOTIFY_KEY2 = 'ec5f36a15c864212a84ab03d15fc7c74'
+SPOTIFY_DATA = os.getenv('SPOTIFY_DATA')
 
 spotify = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials(SPOTIFY_KEY1,SPOTIFY_KEY2))
 
@@ -29,8 +33,11 @@ def req():
             return render_template('index.html', alert_user=alert_user, 
                                             URI_exists=URI_exists)
         
+        df_spotify = pd.read_csv(SPOTIFY_DATA)
+        df_spotify.dropna()
+        df_spotify.drop_duplicates()
         track = spotify.track(URI)
-        print_info(track)
+        # print_info(track)
 
         Cur_Artist = track['artists'][0]['name']
         Cur_Track = track['name']
@@ -40,14 +47,31 @@ def req():
 
         track_list = [URI]
         audio_features_dict = spotify.audio_features(track_list)
-        print(audio_features_dict)
+        songDF = pd.DataFrame(audio_features_dict)
+        results = nn_model(df_spotify,songDF)
+        # print(results) # sanity check
+        rec_songs = {}
+
+        for i in range(5):
+            Rec_URI = spotify.track(results.iloc[i]['id'])
+            rec_songs[i] = {
+           'artists' : results.iloc[i]['artists'],
+           'song' : results.iloc[i]['name'],
+           'album' : Rec_URI['album']['name'],
+           'audio preview' : Rec_URI['preview_url'],
+            'cover art' : Rec_URI['album']['images'][0]['url']
+            }
+
+        # print(audio_features_dict)
+        print(rec_songs) # sanity check
 
         return render_template('index.html', URI_exists=URI_exists,
                                             Cur_Artist=Cur_Artist,
                                             Cur_Track=Cur_Track,
                                             Cur_Album=Cur_Album,
                                             Cur_Audio_Preview=Cur_Audio_Preview,
-                                            Cur_Cover_Art=Cur_Cover_Art)
+                                            Cur_Cover_Art=Cur_Cover_Art,
+                                            rec_songs=rec_songs)
     
     return render_template('index.html', URI_exists=URI_exists)
 
