@@ -4,6 +4,8 @@ import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 import string
 
+# IMPLEMENTED ON 12/15/2023
+
 app = Flask(__name__)
 
 load_dotenv()
@@ -102,3 +104,15 @@ def print_info(track):
 
 if __name__ == '__main__':
     app.run()
+
+# IMPLEMENTED ON 12/16/2023
+    
+def is_valid_spotify_uri(uri):
+    # Define a regular expression pattern for a Spotify URI
+    spotify_uri_pattern = r'^spotify:track:[a-zA-Z0-9]+$'
+
+    # Check if the input URI matches the pattern
+    if re.match(spotify_uri_pattern, uri):
+        return True
+    else:
+        return False
