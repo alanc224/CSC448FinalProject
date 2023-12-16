@@ -21,8 +21,8 @@ import re
 
 # Konrad -- Make sure .env variables have the same name
 load_dotenv()
-SPOTIFY_KEY1 = os.getenv('SPOTIFY_KEY1')
-SPOTIFY_KEY2 = os.getenv('SPOTIFY_KEY2')
+SPOTIFY_KEY1 = '798c070d2d5e4ab98b36353e469dba19' # To prevent the need for authentification, we will change this once semester is over
+SPOTIFY_KEY2 = 'ec5f36a15c864212a84ab03d15fc7c74'
 SPOTIFY_DATA = os.getenv('SPOTIFY_DATA')
 TCC_DATA = os.getenv('TCC_DATA')
 
