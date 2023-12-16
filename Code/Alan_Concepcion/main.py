@@ -26,16 +26,15 @@ TCC_DATA = os.getenv('TCC_DATA')
 spotify = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials(SPOTIFY_KEY1,SPOTIFY_KEY2))
 
 
-def nn_model(df,df_relevant_columns,artist_name,song_name):
-        scaler = MaxAbsScaler()
-        artistname = "['{}']".format(artist_name)
+def nn_model(df,uisDATA,df_relevant_columns):
+        scaler = MaxAbsScaler() # tested other scalers
         X = scaler.fit_transform(df_relevant_columns)
 
-        k = NearestNeighbors(n_neighbors=5, metric='cosine', algorithm='brute')
+        k = NearestNeighbors(n_neighbors=8, metric='euclidean', algorithm='brute')
         k.fit(X)
 
         # Extract features for the input song
-        input_song_details = df[(df['name'] == song_name) & (df['artists'] == artistname)][df_relevant_columns.columns]
+        input_song_details = uisDATA[df_relevant_columns.columns]
         input_song_aesthetic = scaler.transform(input_song_details)
         print(input_song_details) # Sanity check
         print(input_song_aesthetic)
@@ -44,7 +43,10 @@ def nn_model(df,df_relevant_columns,artist_name,song_name):
         distance, indices = k.kneighbors(input_song_aesthetic)
         recommended_songs = df.iloc[indices.flatten()][['artists', 'name']]
 
-        return recommended_songs
+        # having issues with same songs showing up i.e Artist: Taylor Swift Track: I Knew You Were Trouble, showing up 3 times since there is like 5 versions, here is a hack fix
+        # only issue is if song that is inputted is NOT in dataset wont have dupes and it just ends up ommiting a song
+        recommended_songs = recommended_songs.drop_duplicates()
+        return recommended_songs.head(6)[1:]
 
 
 def getid(artist_name, song_name):
@@ -98,25 +100,22 @@ def main():
     # Testing spotify api, works so far
     found = False
     while not found:
-        artist_name = input("Enter artist name: ")
-        if name_lookup(artist_name, df_spotify):
+        track_id = input("Enter uri: ")
+        if spotify.track(track_id):
             found = True
-            artist_name=name_lookup(artist_name,df_spotify)
 
-    found = False
-    while not found:
-        song_name = input("Enter song name: ")
-        if song_lookup(song_name, df_spotify):
-            found = True
-            song_name = song_lookup(song_name, df_spotify)
-
-    track_id = getid(artist_name, song_name)
     track = spotify.track(track_id)
     print_info(track)
+    artist_name = track['artists'][0]['name']
+    song_name = track['name']
+    song_features = spotify.audio_features(track_id)
+    songDF = pd.DataFrame(song_features)
+    songDF = songDF.drop(columns=['track_href','analysis_url','type','id','uri','time_signature','mode','key','duration_ms','tempo',])
+    print(songDF)
 
     # Using content based filtering
     # making new dataframe with relevant columns
-    df_relevant_columns = df_spotify.drop(columns=['id','name','release_date','artists','mode'], axis=1)
+    df_relevant_columns = df_spotify.drop(columns=['id','name','release_date','artists','year', 'explicit', 'popularity','mode','key','duration_ms','tempo'], axis=1)
     df_relevant_columns.dropna(inplace=True)
     chi_square_value,p_value=calculate_bartlett_sphericity(df_relevant_columns)
     print(chi_square_value, p_value)
@@ -127,7 +126,7 @@ def main():
     fa.fit(df_relevant_columns, 25)
     # Check Eigenvalues
     ev, v = fa.get_eigenvalues()
-    print(ev)
+    # print(ev)
 
     plt.scatter(range(1,df_relevant_columns.shape[1]+1),ev)
     plt.plot(range(1,df_relevant_columns.shape[1]+1),ev)
@@ -139,12 +138,12 @@ def main():
 
     fa.set_params(n_factors=4, rotation="varimax")
     fa.fit(df_relevant_columns)
-    print(fa.loadings_)
+    # print(fa.loadings_)
     print(fa.get_factor_variance())
 
 
     print(df_relevant_columns.columns) # sanity check
-    print(nn_model(df_spotify,df_relevant_columns,track['artists'][0]['name'],track['name'])) # using track['name'] as a lazy fix for songs like "the arms of sorrow" -> "The Arms of Sorrow"
+    print(nn_model(df_spotify,songDF,df_relevant_columns))
 
     
 
