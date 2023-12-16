@@ -3,29 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Login Form</title>
+    <title>Input URI</title>
 </head>
 
 <center>
     <form method="post">
         <h2>Music Recommendation System</h2>
     
-        <label for="artist">Enter artist name:</label>
-        <input type="artist" id="artist" name="artist" required> <br><br>
-    
-        <label for="song">Enter song name:</label>
-        <input type="song" id="song" name="song" required> <br><br>
+        <label for="URI">Enter URI:</label>
+        <input type="URI" id="URI" name="URI" required> <br><br>
 
-        {% if song_exists == False %}
-            <div class="alert" role="alert">
-                {{ alert_user }}
-            </div>
-        {% endif %}
     
         <input type="submit" value="Submit">
     </form>
 
-    {% if song_exists == False %}
+    {% if URI_exists == False %}
         <div class="cur_input" role="cur_input">
             <h3>No Song Input Yet...</h3>
         </div>
