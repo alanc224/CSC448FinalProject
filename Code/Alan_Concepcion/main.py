@@ -26,8 +26,8 @@ TCC_DATA = os.getenv('TCC_DATA')
 spotify = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials(SPOTIFY_KEY1,SPOTIFY_KEY2))
 
 
-def nn_model(df,uisDATA,df_relevant_columns,artist_name,song_name):
-        scaler = MaxAbsScaler()
+def nn_model(df,uisDATA,df_relevant_columns):
+        scaler = MaxAbsScaler() # tested other scalers
         X = scaler.fit_transform(df_relevant_columns)
 
         k = NearestNeighbors(n_neighbors=8, metric='euclidean', algorithm='brute')
@@ -111,7 +111,7 @@ def main():
     song_features = spotify.audio_features(track_id)
     songDF = pd.DataFrame(song_features)
     songDF = songDF.drop(columns=['track_href','analysis_url','type','id','uri','time_signature','mode','key','duration_ms','tempo',])
-    # print(songDF)
+    print(songDF)
 
     # Using content based filtering
     # making new dataframe with relevant columns
@@ -143,7 +143,7 @@ def main():
 
 
     print(df_relevant_columns.columns) # sanity check
-    print(nn_model(df_spotify,songDF,df_relevant_columns,artist_name,song_name))
+    print(nn_model(df_spotify,songDF,df_relevant_columns))
 
     
 
