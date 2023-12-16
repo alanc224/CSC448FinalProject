@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 import string
+import re
 
 app = Flask(__name__)
 
@@ -22,16 +23,13 @@ def req():
 
         print(URI)
 
-        URI_exists = True
-        track_id = URI
-
-        if track_id == None:
+        if is_valid_spotify_uri(URI) == False:
             URI_exists = False
-            alert_user = "This combination of artist and song is not recognized :("
+            alert_user = "This URI is not recognized :("
             return render_template('index.html', alert_user=alert_user, 
                                             URI_exists=URI_exists)
         
-        track = spotify.track(track_id)
+        track = spotify.track(URI)
         print_info(track)
 
         Cur_Artist = track['artists'][0]['name']
@@ -40,7 +38,7 @@ def req():
         Cur_Audio_Preview = track['preview_url']
         Cur_Cover_Art = track['album']['images'][0]['url']
 
-        track_list = [track_id]
+        track_list = [URI]
         audio_features_dict = spotify.audio_features(track_list)
         print(audio_features_dict)
 
@@ -53,20 +51,15 @@ def req():
     
     return render_template('index.html', URI_exists=URI_exists)
 
-# Taken from Alan/main.py
-def getid(artist_name, song_name):
-    if artist_name == None and song_name == None:
-        print("On app start")
-        return None
+def is_valid_spotify_uri(uri):
+    # Define a regular expression pattern for a Spotify URI
+    spotify_uri_pattern = r'^spotify:track:[a-zA-Z0-9]+$'
 
-    #artistname = artist_name.strip("['']")
-    results = spotify.search(q="artist" + artist_name + "track" + song_name, type="track", limit=1)
-    SPOTIFY_ARTIST = results["tracks"]["items"][0]['artists'][0]['name']
-    if "tracks" in results and "items" in results["tracks"] and SPOTIFY_ARTIST == artist_name:
-        return results["tracks"]["items"][0]["id"]
+    # Check if the input URI matches the pattern
+    if re.match(spotify_uri_pattern, uri):
+        return True
     else:
-        print("Track not found.")
-        return None
+        return False
 
 # Taken from Alan/main.py
 def name_lookup(name, df):
