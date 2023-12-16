@@ -96,7 +96,11 @@ def print_info(track):
     print('\nArtist: ' + track['artists'][0]['name'])
     print('Track: ' + track['name'])
     print('Album: ' + track['album']['name'])
-    print('Audio Preview: ' + track['preview_url'])
+    AP = track['preview_url']
+    if AP is None:
+        print("No Audio Preview available")
+    else:
+        print('Audio Preview: ' + track['preview_url'])
     print('Cover Art: ' + track['album']['images'][0]['url'])
 
 
