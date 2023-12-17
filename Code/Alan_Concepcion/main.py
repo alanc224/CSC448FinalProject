@@ -83,38 +83,40 @@ def main():
     songDF = songDF.drop(columns=['track_href','analysis_url','type','id','uri','time_signature'
                                   ,'mode','key','liveness','duration_ms'])
     print(songDF)
+    # making new dataframe with relevant columns
     df_relevant_columns = df_spotify.drop(columns=['id','name','release_date','artists','year', 'explicit', 'popularity'
                                                    ,'mode','key','liveness','duration_ms'], axis=1)
 
     # Using content based filtering
-    # making new dataframe with relevant columns
+    # Using Factor Analysis
     chi_square_value,p_value=calculate_bartlett_sphericity(df_relevant_columns)
     print(chi_square_value, p_value)
     kmo_all,kmo_model=calculate_kmo(df_relevant_columns)
-    print(kmo_model)
+    print(kmo_model) # this number should be higher than 0.60 and as close to 1.0 as possible
     print("Individual kmo values:")
-    print(kmo_all)
+    print(kmo_all) # If any of the values are less than 0.50, they could be dropped depending on how much value they have to the model, liveness was below 0.50 
 
     fa = FactorAnalyzer()
     fa.fit(df_relevant_columns, 25)
     # Check Eigenvalues
     ev, v = fa.get_eigenvalues()
-    print(ev)
+    print(ev) # look at the matrix here, how many values above 1.0, in this case its 2 so for n_factors at fa.set_params(n_factors=2, rotation="varimax"), using 2
 
-    plt.scatter(range(1,df_relevant_columns.shape[1]+1),ev)
-    plt.plot(range(1,df_relevant_columns.shape[1]+1),ev)
+    plt.scatter(range(1,df_relevant_columns.shape[1]+1),ev) # extra verification with this graph
+    plt.plot(range(1,df_relevant_columns.shape[1]+1),ev) # notice that after 2 we don't get significant changes and it just sorta repeats
     plt.title('Scree Plot')
     plt.xlabel('Factors')
     plt.ylabel('Eigenvalue')
     plt.grid()
     plt.show()
 
-    fa.set_params(n_factors=2, rotation="varimax")
+    fa.set_params(n_factors=2, rotation="varimax") # using 2 here for n_factors from above
     fa.fit(df_relevant_columns)
     factor_loading_matrix = pd.DataFrame(fa.loadings_, columns=['Factor 1', 'Factor 2'],index=df_relevant_columns.columns.tolist())
-    print(factor_loading_matrix)
+    print(factor_loading_matrix) # for further details please read the datacamp link on what these values signify
     factor_get_factor_matrix = pd.DataFrame(fa.get_factor_variance(), columns=['Factor 1', 'Factor 2'],index=['SS Loadings', 'Proportion Var', 'Cumulative Var'])
-    print(factor_get_factor_matrix)
+    print(factor_get_factor_matrix) # for further details please read the datacamp link on what these values signify but tldr look at the last 
+                                    # Cumulative Var number in this case it's 0.477090 or 47% 
 
 
     print(nn_model(df_spotify,songDF))
