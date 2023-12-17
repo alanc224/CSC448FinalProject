@@ -2,7 +2,7 @@ import os
 from flask import Flask, render_template, request
 from dotenv import load_dotenv
 import pandas as pd
-from main import nn_model
+from main import nn_model, kmeanFS
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 import string
@@ -24,6 +24,8 @@ def req():
     if request.method == 'POST':
         URI_exists = True
         URI = request.form.get('URI')
+        method = request.form.get('Models')
+        print(method)
 
         URI = URI.split("/")[-1].split("?")[0]
 
@@ -56,7 +58,14 @@ def req():
         track_list = [URI]
         audio_features_dict = spotify.audio_features(track_list)
         songDF = pd.DataFrame(audio_features_dict)
-        results = nn_model(df_spotify,songDF)
+
+        if method == "K-Nearest Neighbors":
+
+            results = nn_model(df_spotify,songDF)
+
+        elif method == "K-Means Clustering":
+            results = kmeanFS(df_spotify,songDF)
+
         # print(results) # sanity check
         rec_songs = {}
 

@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 import os
 from sklearn.neighbors import NearestNeighbors
 from sklearn.manifold import TSNE
+from sklearn.cluster import KMeans
 import spotipy
 from sklearn.preprocessing import MaxAbsScaler, MinMaxScaler, StandardScaler
 from spotipy.oauth2 import SpotifyClientCredentials
@@ -55,6 +56,33 @@ def nn_model(df,uisDATA):
         # only issue is if song that is inputted is NOT in dataset wont have dupes and it just ends up ommiting a song
         recommended_songs = recommended_songs.drop_duplicates()
         return recommended_songs.head(6)[1:]
+
+def kmeanFS(df, uisDATA):
+
+    features = ['valence', 'acousticness', 'danceability', 'energy', 'instrumentalness', 'key', 'loudness', 'mode', 'speechiness', 'tempo' ]
+    df_useful_features = df[features]
+    input_song_details = uisDATA[df_useful_features.columns]
+    model = KMeans(n_clusters=10)
+    model.fit(df_useful_features)
+
+    clustered = df.copy()
+    clustered['type'] = model.labels_
+
+    print(input_song_details) # Sanity check
+    uisDATA = uisDATA.drop(columns = ['analysis_url', 'duration_ms', 'id', 'liveness', 'time_signature', 'track_href', "uri", 'type'])
+    uisDATA = uisDATA[['valence', 'acousticness', 'danceability', 'energy', 'instrumentalness', 'key', 'loudness', 'mode', 'speechiness', 'tempo']]
+    
+    test = model.predict(uisDATA)
+
+    suggestions = clustered[clustered.type == test[0]]
+    suggestions.drop_duplicates()
+    suggestions.sample(n=5)
+
+    suggestions = suggestions[['artists', 'name', 'id']]
+
+    return suggestions
+
+
 
 def main():
     df_spotify = pd.read_csv(SPOTIFY_DATA)
