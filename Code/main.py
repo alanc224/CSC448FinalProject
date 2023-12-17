@@ -49,7 +49,7 @@ def nn_model(df,uisDATA):
 
         scaler.fit_transform(df_relevant_columns)
         distance, indices = k.kneighbors(input_song_aesthetic)
-        recommended_songs = df.iloc[indices.flatten()][['artists', 'name']]
+        recommended_songs = df.iloc[indices.flatten()][['artists', 'name','id']]
 
         # having issues with same songs showing up i.e Artist: Taylor Swift Track: I Knew You Were Trouble, showing up 3 times since there is like 5 versions, here is a hack fix
         # only issue is if song that is inputted is NOT in dataset wont have dupes and it just ends up ommiting a song
