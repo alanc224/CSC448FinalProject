@@ -28,7 +28,12 @@
             <p style="font-size: 10px">Album Name:  {{Cur_Album}}</p>
             <p style="font-size: 10px">Artist Name:  {{Cur_Artist}}</p>
             <p style="font-size: 10px">
-                Audio Preview:  <a href="{{Cur_Audio_Preview}}">Audio Preview</a>
+                {% if Cur_Audio_Preview %}
+                        Audio Preview:  <a href="{{Cur_Audio_Preview}}">Audio Preview</a>
+                    {% else %}
+                        No audio preview available
+                    {% endif %}
+                
             </p>
         </div>
         {% for i, song_info in rec_songs.items() %}
