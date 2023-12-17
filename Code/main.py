@@ -5,19 +5,10 @@ import os
 from sklearn.neighbors import NearestNeighbors
 from sklearn.manifold import TSNE
 import spotipy
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import MaxAbsScaler, MinMaxScaler, StandardScaler
 from spotipy.oauth2 import SpotifyClientCredentials
 import matplotlib.pyplot as plt
 import plotly.express as px
-
-import nltk
-from nltk import word_tokenize
-from nltk.stem import PorterStemmer
-from nltk.stem import WordNetLemmatizer
-from nltk.corpus import wordnet
-
-import string
-import re
 
 # Konrad -- Make sure .env variables have the same name
 load_dotenv()
@@ -28,80 +19,61 @@ TCC_DATA = os.getenv('TCC_DATA')
 
 spotify = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials(SPOTIFY_KEY1,SPOTIFY_KEY2))
 
-def getid(artist_name, song_name):
-    artistname = artist_name.strip("['']")
-    results = spotify.search(q="artist" + artistname + "track" + song_name, type="track", limit=1)
-    SPOTIFY_ARTIST = results["tracks"]["items"][0]['artists'][0]['name']
-    if "tracks" in results and "items" in results["tracks"] and SPOTIFY_ARTIST == artistname:
-        return results["tracks"]["items"][0]["id"]
-    else:
-        print("Track not found.")
-        return None
-
-
-def name_lookup(name, df):
-    formatting_input = "['{}']".format(string.capwords(name))
-    lookup = df[df['artists'].str.lower() == formatting_input.lower()]
-
-    if not lookup.empty:
-        return formatting_input
-    else:
-        print("Artist not found")
-        return False
-
-
-def song_lookup(song, df):
-    lookup = df[df['name'].str.lower() == song.lower()]
-
-    if not lookup.empty:
-        return string.capwords(song)
-    else:
-        print("Song not found.")
-        return False
-
-
 def print_info(track):
     print('\nArtist: ' + track['artists'][0]['name'])
     print('Track: ' + track['name'])
     print('Album: ' + track['album']['name'])
-    print('Audio Preview: ' + track['preview_url'])
+    AP = track['preview_url']
+    if AP is None:
+        print("No Audio Preview available")
+    else:
+        print('Audio Preview: ' + track['preview_url'])
     print('Cover Art: ' + track['album']['images'][0]['url'])
 
+
+def nn_model(df,uisDATA):
+        
+        df_relevant_columns = df.drop(columns=['id','name','release_date','artists','year', 'explicit', 'popularity'
+                                               ,'mode','key','liveness','duration_ms'], axis=1)
+        df_relevant_columns.dropna(inplace=True)
+        scaler = StandardScaler() # tested other scalers
+        X = scaler.fit_transform(df_relevant_columns)
+        k = NearestNeighbors(n_neighbors=7, metric='euclidean', algorithm='ball_tree')
+        k.fit(X)
+
+        # Extract features for the input song
+        input_song_details = uisDATA[df_relevant_columns.columns]
+        input_song_aesthetic = scaler.transform(input_song_details)
+        print(input_song_details) # Sanity check
+        # print(input_song_aesthetic)
+
+        scaler.fit_transform(df_relevant_columns)
+        distance, indices = k.kneighbors(input_song_aesthetic)
+        recommended_songs = df.iloc[indices.flatten()][['artists', 'name']]
+
+        # having issues with same songs showing up i.e Artist: Taylor Swift Track: I Knew You Were Trouble, showing up 3 times since there is like 5 versions, here is a hack fix
+        # only issue is if song that is inputted is NOT in dataset wont have dupes and it just ends up ommiting a song
+        recommended_songs = recommended_songs.drop_duplicates()
+        return recommended_songs.head(6)[1:]
 
 def main():
     df_spotify = pd.read_csv(SPOTIFY_DATA)
 
-    dupes = df_spotify[
-    (df_spotify['name'].str.contains('Neon')) & (df_spotify['artists'].str.contains('John Mayer'))]
-    print(dupes[['name', 'artists']])
-    # need to drop dupes of same songs but contain extra words as seen in example above
-
-    ''' Konrad --- testing if .env variables work, they do :)
-    #               make sure your path variables are good if you run into any errors
     df_spotify = pd.read_csv(SPOTIFY_DATA)
-    print(df_spotify.head(10))
-    print(df_spotify.columns)
-    '''
+    df_spotify.dropna()
+    df_spotify.drop_duplicates()
 
     # Testing spotify api, works so far
     found = False
     while not found:
-        artist_name = input("Enter artist name: ")
-        if name_lookup(artist_name, df_spotify):
+        track_id = input("Enter uri: ")
+        if spotify.track(track_id):
             found = True
-            artist_name=name_lookup(artist_name,df_spotify)
 
-    found = False
-    while not found:
-        song_name = input("Enter song name: ")
-        if song_lookup(song_name, df_spotify):
-            found = True
-            song_name = song_lookup(song_name, df_spotify)
-
-    track_id = getid(artist_name, song_name)
     track = spotify.track(track_id)
     print_info(track)
-
+    song_features = spotify.audio_features(track_id)
+    songDF = pd.DataFrame(song_features)
 
 
     
