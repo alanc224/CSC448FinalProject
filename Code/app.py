@@ -25,7 +25,12 @@ def req():
         URI_exists = True
         URI = request.form.get('URI')
 
-        print(URI)
+        URI = URI.split("/")[-1].split("?")[0]
+
+        URI = "spotify:track:"+URI
+
+        print(URI) # now we're gonna take a link instead
+
 
         if is_valid_spotify_uri(URI) == False:
             URI_exists = False
