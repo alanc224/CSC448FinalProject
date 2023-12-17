@@ -27,7 +27,10 @@ def req():
 
         URI = URI.split("/")[-1].split("?")[0]
 
-        URI = "spotify:track:"+URI
+        if URI[0:14] == "spotify:track:":
+            pass
+        else:
+            URI = "spotify:track:"+URI
 
         print(URI) # now we're gonna take a link instead
 
