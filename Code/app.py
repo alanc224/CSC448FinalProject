@@ -2,7 +2,7 @@ import os
 from flask import Flask, render_template, request
 from dotenv import load_dotenv
 import pandas as pd
-from main import nn_model, kmeanFS
+from main import nn_model, kmeanFS, knnFAR
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 import string
@@ -25,7 +25,7 @@ def req():
         URI_exists = True
         URI = request.form.get('URI')
         method = request.form.get('Models')
-        print(method)
+        # print(method)
 
         URI = URI.split("/")[-1].split("?")[0]
 
@@ -34,7 +34,7 @@ def req():
         else:
             URI = "spotify:track:"+URI
 
-        print(URI) # now we're gonna take a link instead
+        # print(URI) # now we're gonna take a link instead
 
 
         if is_valid_spotify_uri(URI) == False:
@@ -65,6 +65,9 @@ def req():
 
         elif method == "K-Means Clustering":
             results = kmeanFS(df_spotify,songDF)
+        
+        elif method == "K-NN With FAR":
+            results = knnFAR(df_spotify,songDF)
 
         # print(results) # sanity check
         rec_songs = {}
@@ -80,7 +83,7 @@ def req():
             }
 
         # print(audio_features_dict)
-        print(rec_songs) # sanity check
+        # print(rec_songs) # sanity check
 
         return render_template('index.html', URI_exists=URI_exists,
                                             Cur_Artist=Cur_Artist,

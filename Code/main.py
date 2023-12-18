@@ -3,13 +3,10 @@ import pandas as pd
 from dotenv import load_dotenv
 import os
 from sklearn.neighbors import NearestNeighbors
-from sklearn.manifold import TSNE
-from sklearn.cluster import KMeans
+from sklearn.cluster import FeatureAgglomeration, KMeans
 import spotipy
 from sklearn.preprocessing import MaxAbsScaler, MinMaxScaler, StandardScaler
 from spotipy.oauth2 import SpotifyClientCredentials
-import matplotlib.pyplot as plt
-import plotly.express as px
 
 # Konrad -- Make sure .env variables have the same name
 load_dotenv()
@@ -81,6 +78,37 @@ def kmeanFS(df, uisDATA):
     suggestions = suggestions[['artists', 'name', 'id']]
 
     return suggestions
+
+
+def knnFAR(df,uisDATA):
+
+    df_relevant_columns = df.drop(columns=['id','name','release_date','year','artists', 'popularity','explicit'], axis=1)
+    
+    df_song = uisDATA.drop(columns=['track_href','analysis_url','type','id','uri','time_signature'])
+    song_df_reorder = ['valence', 'acousticness', 'danceability', 'duration_ms', 'energy', 'instrumentalness', 'key', 'liveness', 'loudness', 'mode', 'speechiness', 'tempo']
+    df_song = df_song[song_df_reorder]
+
+    standard = StandardScaler()
+
+    X_standard = standard.fit_transform(df_relevant_columns)
+    song_standard = standard.transform(df_song)
+
+    agglo = FeatureAgglomeration(n_clusters = 4)
+
+    X_agglo = agglo.fit_transform(X_standard)
+    song_agglo = agglo.transform(song_standard)
+
+    knn_model = NearestNeighbors(n_neighbors=5)
+    knn_model.fit(X_agglo)
+
+    input_song = df_song[df_relevant_columns.columns]
+    input_song_scaled = standard.transform(input_song)
+    input_song_agglo = agglo.transform(input_song_scaled)
+
+    distances, indices = knn_model.kneighbors(input_song_agglo)
+    recommended_songs = df.iloc[indices.flatten()][['artists', 'name', 'id']]
+
+    return recommended_songs
 
 
 
