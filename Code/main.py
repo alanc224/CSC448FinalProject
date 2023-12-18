@@ -31,28 +31,27 @@ def print_info(track):
 
 def nn_model(df,uisDATA):
         
-        df_relevant_columns = df.drop(columns=['id','name','release_date','artists','year', 'explicit', 'popularity'
-                                               ,'mode','key','liveness','duration_ms'], axis=1)
-        df_relevant_columns.dropna(inplace=True)
-        scaler = StandardScaler() # tested other scalers
-        X = scaler.fit_transform(df_relevant_columns)
-        k = NearestNeighbors(n_neighbors=7, metric='euclidean', algorithm='ball_tree')
-        k.fit(X)
+    df_relevant_columns = df.drop(columns=['id','name','release_date','artists','year','duration_ms','liveness','key','mode','explicit','popularity'], axis=1)
+    df_relevant_columns.dropna(inplace=True)
+    scaler = StandardScaler() # tested other scalers
+    X = scaler.fit_transform(df_relevant_columns)
+    k = NearestNeighbors(n_neighbors=7, metric='euclidean', algorithm='ball_tree')
+    k.fit(X)
 
-        # Extract features for the input song
-        input_song_details = uisDATA[df_relevant_columns.columns]
-        input_song_aesthetic = scaler.transform(input_song_details)
-        print(input_song_details) # Sanity check
-        # print(input_song_aesthetic)
+    # Extract features for the input song
+    input_song_details = uisDATA[df_relevant_columns.columns]
+    input_song_aesthetic = scaler.transform(input_song_details)
+    print(input_song_details) # Sanity check
+    # print(input_song_aesthetic)
 
-        scaler.fit_transform(df_relevant_columns)
-        distance, indices = k.kneighbors(input_song_aesthetic)
-        recommended_songs = df.iloc[indices.flatten()][['artists', 'name','id']]
+    scaler.fit_transform(df_relevant_columns)
+    distance, indices = k.kneighbors(input_song_aesthetic)
+    recommended_songs = df.iloc[indices.flatten()][['artists', 'name','id']]
 
-        # having issues with same songs showing up i.e Artist: Taylor Swift Track: I Knew You Were Trouble, showing up 3 times since there is like 5 versions, here is a hack fix
-        # only issue is if song that is inputted is NOT in dataset wont have dupes and it just ends up ommiting a song
-        recommended_songs = recommended_songs.drop_duplicates()
-        return recommended_songs.head(6)[1:]
+    # having issues with same songs showing up i.e Artist: Taylor Swift Track: I Knew You Were Trouble, showing up 3 times since there is like 5 versions, here is a hack fix
+    # only issue is if song that is inputted is NOT in dataset wont have dupes and it just ends up ommiting a song
+    recommended_songs = recommended_songs.drop_duplicates()
+    return recommended_songs.head(6)[1:]
 
 def kmeanFS(df, uisDATA):
 
