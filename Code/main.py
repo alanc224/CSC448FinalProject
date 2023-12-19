@@ -72,7 +72,7 @@ def kmeanFS(df, uisDATA):
 
     suggestions = clustered[clustered.type == test[0]]
     suggestions.drop_duplicates()
-    suggestions.sample(n=5)
+    suggestions = suggestions.sample(n=5)
 
     suggestions = suggestions[['artists', 'name', 'id']]
 
