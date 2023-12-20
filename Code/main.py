@@ -4,7 +4,7 @@ import os
 from sklearn.neighbors import NearestNeighbors
 from sklearn.cluster import FeatureAgglomeration, KMeans
 import spotipy
-from sklearn.preprocessing import MaxAbsScaler, MinMaxScaler, StandardScaler
+from sklearn.preprocessing import StandardScaler
 from spotipy.oauth2 import SpotifyClientCredentials
 
 # Konrad -- Make sure .env variables have the same name
