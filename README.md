@@ -5,6 +5,9 @@ We are creating an interactive music recommendation model that is capable of tak
 
 We also implemented the Spotify API that allows us to process the input song and extract its audio attributes and features of the song to compare it to the characteristics of the songs from our dataset. Additionally, we also use the Spotify API to provide audio samples below (if available) the outputted list of song recommendations, so that users can access the song more efficiently to judge if they like it or not.
 
+Music Recommendation Model Web Application Implementation:
+<img src='https://github.com/alanc224/CSC448FinalProject/blob/main/Music_Recommendation_Model_Web_App.gif' width='' />
+
 <p align="center">
     <details>
         <summary>Presentation Slides</summary>
