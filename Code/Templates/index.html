@@ -57,8 +57,8 @@
             </p>
         </div>
         {% for i, song_info in rec_songs.items() %}
-        <hr>
-            <div class="cur_input" role="cur_input">
+        
+            <div style="float:left; width: 20%;;" class="cur_input" role="cur_input">
                 <img src="{{song_info['cover art']}}" alt="Cover Art" width="200" height="200"> 
                 <h3 style="font-size: 20px">Track Name: {{ song_info['song'] }}</h3>
                 <p style="font-size: 20px">Album Name:  {{ song_info['album'] }}</p>
