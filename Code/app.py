@@ -2,7 +2,7 @@ import os
 from flask import Flask, render_template, request
 from dotenv import load_dotenv
 import pandas as pd
-from main import nn_model, kmeanFS, knnFAR, kmeans_lvf
+from main import nn_model, kmeanFS, nn_FAR, kmeans_lvf
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 import string
@@ -66,7 +66,7 @@ def req():
             results = kmeanFS(df_spotify,songDF)
         
         elif method == "K-NN With FAR":
-            results = knnFAR(df_spotify,songDF)
+            results = nn_FAR(df_spotify,songDF)
 
         elif method == "K-Means With LVF":
             results = kmeans_lvf(df_spotify,songDF)
