@@ -20,7 +20,7 @@
     <form method="post">
         <h2>Music Recommendation System</h2>
         
-        <label for="Models">Model:</label>
+        <label for="Models">Choose a Model:</label>
             <select name="Models" id="Models">
                 <option value="K-Nearest Neighbors">K-Nearest Neighbors</option>
                 <option value="K-Means Clustering">K-Means Clustering</option>
@@ -43,11 +43,11 @@
         </div>
     {% else %}
         <div class="cur_input" role="cur_input">
-            <img src="{{Cur_Cover_Art}}" alt="Cover Art" width="100" height="100"> 
-            <h3 style="font-size: 10px">Track Name: {{Cur_Track}}</h3>
-            <p style="font-size: 10px">Album Name:  {{Cur_Album}}</p>
-            <p style="font-size: 10px">Artist Name:  {{Cur_Artist}}</p>
-            <p style="font-size: 10px">
+            <img src="{{Cur_Cover_Art}}" alt="Cover Art" width="200" height="200"> 
+            <h3 style="font-size: 20px">Track Name: {{Cur_Track}}</h3>
+            <p style="font-size: 20px">Album Name:  {{Cur_Album}}</p>
+            <p style="font-size: 20px">Artist Name:  {{Cur_Artist}}</p>
+            <p style="font-size: 20px">
                 {% if Cur_Audio_Preview %}
                         Audio Preview:  <a href="{{Cur_Audio_Preview}}">Audio Preview</a>
                     {% else %}
@@ -59,11 +59,11 @@
         {% for i, song_info in rec_songs.items() %}
         <hr>
             <div class="cur_input" role="cur_input">
-                <img src="{{song_info['cover art']}}" alt="Cover Art" width="100" height="100"> 
-                <h3 style="font-size: 10px">Track Name: {{ song_info['song'] }}</h3>
-                <p style="font-size: 10px">Album Name:  {{ song_info['album'] }}</p>
-                <p style="font-size: 10px">Artist Name:  {{ song_info['artists'] }}</p>
-                <p style="font-size: 10px">
+                <img src="{{song_info['cover art']}}" alt="Cover Art" width="200" height="200"> 
+                <h3 style="font-size: 20px">Track Name: {{ song_info['song'] }}</h3>
+                <p style="font-size: 20px">Album Name:  {{ song_info['album'] }}</p>
+                <p style="font-size: 20px">Artist Name:  {{ song_info['artists'] }}</p>
+                <p style="font-size: 20px">
                     {% if song_info['audio preview'] %}
                         Audio Preview:  <a href="{{ song_info['audio preview'] }}">Audio Preview</a>
                     {% else %}
