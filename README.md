@@ -20,10 +20,13 @@ We also implemented the Spotify API that allows us to process the input song and
 </p>
 
 # Group 4 (TBD)
-[Alan Concepcion](./Code/Alan_Concepcion/)  
-[Konrad Zielinski](./Code/Konrad_Zielinski/)  
-[Anthony Zhu](./Code/Anthony_Zhu/)  
-[Daphne Tang](./Code/Daphne_Tang/)  
+[Alan Concepcion](./Code/Alan_Concepcion/) - Created and structued the gitub; created a K-NN model with factor analysis for the back-end; assisted in front-end development; set up the keys for the Spotify API; structured the report.   
+
+[Konrad Zielinski](./Code/Konrad_Zielinski/) - Created a K-NN model which uses feature agglomeration to perform dimensionality reduction; created the basis for the front-end functionality; created the basis for our flask backend and connected it to the front-end; wrote for the Modeling and K-Nearest Neighbors sections, as well as the FeatureAgglomeration section in the report.  
+
+[Anthony Zhu](./Code/Anthony_Zhu/) - Created a K-Means Clustering model with feature selection to group the data songs in the data set into 10 clusters and integrated the model with the flask app.  
+
+[Daphne Tang](./Code/Daphne_Tang/) - Created a K-means model with low variance filtering for the back-end; integrated the model into the flask application; created visualizations for the Analysis part; proofread and edited the report; wrote the K-means Clustering and Low Variance Filter sections in the report.  
 # Installaton
 Need brief description  
 [Requirements](requirements.txt) - includes all of the packages used + versions  
