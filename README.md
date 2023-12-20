@@ -46,7 +46,4 @@ Our flask application gives the user the option to choose between 4 distinct uns
 The models used in our project are K-means clustering and K-nearest neighbors. We decided on 2 unsupervised learning models while using 4 distinct dimension reduction techniques.  The reduction techniques used are Factor Analysis,  FeatureAgglomeration Reduction, Feature Selection reduction, and Low Variance Filter. 
 
 # Resources 
-Credit any resources here
-
-[Music Dataset : 1950 to 2019 posted by Saurabh Shahane](https://www.kaggle.com/datasets/saurabhshahane/music-dataset-1950-to-2019)  
 [Spotify dataset posted by Vastal Mavani](https://www.kaggle.com/datasets/vatsalmavani/spotify-dataset/data)
