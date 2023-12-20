@@ -31,6 +31,30 @@ We also implemented the Spotify API that allows us to process the input song and
 Need brief description  
 [Requirements](requirements.txt) - includes all of the packages used + versions  
 [Instructions](instructions.txt) - includes instructions for setting up various parts of the project
+install all neccessary packages using requirements.txt
+
+     - Creating a virtual environment may be preferred before this step.
+     Documentation on how to create a virtual environment - (https://docs.python.org/3/library/venv.html)
+    1. run the following command: "pip install -r requirements.txt"
+        
+
+Set up and use environment variables from .env file
+
+    1. create a new file in VScode, name it ".env"
+    2. declare variables in the .env file as you would in any other python file
+        - The environment variable 'SPOTIFY_DATA' should be the path for the Spotify Dataset after extracting to your desired location.
+            Example: Within .env the environment variable may look like [ SPOTIFY_DATA = path/to/the/spotify/data/set/here ] 
+    3. import load_dotenv from dotenv package in whatever file you want to use the .env variable
+    4. type "load_dotenv()" into your file and then get the variable you need using "os.getenv("VARIABLE_NAME_HERE)"
+
+Running the application
+
+    1. In order to run the application, make sure the aforementioned steps have been completed. 
+        - Installation of all the necessary packages
+        - cd into the Code directory
+        - Run the command flask run
+            - This will run the python file app.py
+    
 # Implementation
 Libraries used in our Project:
  * **Pandas**;  used for reading the datasets, creating one of our own, and exploratory data analysis
