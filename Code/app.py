@@ -20,11 +20,12 @@ spotify = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials(SP
 @app.route('/', methods=['GET','POST'])
 def req():
     URI_exists = False
+    selected_method = None
 
     if request.method == 'POST':
         URI_exists = True
         URI = request.form.get('URI')
-        method = request.form.get('Models')
+        selected_method  = request.form.get('Models')
         # print(method)
 
         URI = URI.split("/")[-1].split("?")[0]
@@ -59,16 +60,16 @@ def req():
         audio_features_dict = spotify.audio_features(track_list)
         songDF = pd.DataFrame(audio_features_dict)
 
-        if method == "K-Nearest Neighbors":
+        if selected_method  == "K-Nearest Neighbors":
             results = nn_model(df_spotify,songDF)
 
-        elif method == "K-Means Clustering":
+        elif selected_method  == "K-Means Clustering":
             results = kmeanFS(df_spotify,songDF)
         
-        elif method == "K-NN With FAR":
+        elif selected_method  == "K-NN With FAR":
             results = nn_FAR(df_spotify,songDF)
 
-        elif method == "K-Means With LVF":
+        elif selected_method  == "K-Means With LVF":
             results = kmeans_lvf(df_spotify,songDF)
 
         # print(results) # sanity check
@@ -93,9 +94,10 @@ def req():
                                             Cur_Album=Cur_Album,
                                             Cur_Audio_Preview=Cur_Audio_Preview,
                                             Cur_Cover_Art=Cur_Cover_Art,
-                                            rec_songs=rec_songs)
+                                            rec_songs=rec_songs,
+                                            selected_method=selected_method )
     
-    return render_template('index.html', URI_exists=URI_exists)
+    return render_template('index.html', URI_exists=URI_exists, selected_method=selected_method)
 
 def is_valid_spotify_uri(uri):
     # Define a regular expression pattern for a Spotify URI
