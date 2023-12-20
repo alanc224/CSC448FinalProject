@@ -28,9 +28,7 @@ We also implemented the Spotify API that allows us to process the input song and
 
 [Daphne Tang](./Code/Daphne_Tang/) - Created a K-means model with low variance filtering for the back-end; integrated the model into the flask application; created visualizations for the Analysis part; proofread and edited the report; wrote the K-means Clustering and Low Variance Filter sections in the report.  
 # Installaton
-Need brief description  
 [Requirements](requirements.txt) - includes all of the packages used + versions  
-[Instructions](instructions.txt) - includes instructions for setting up various parts of the project
 install all neccessary packages using requirements.txt
 
      - Creating a virtual environment may be preferred before this step.
