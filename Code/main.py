@@ -79,13 +79,11 @@ def kmeanFS(df, uisDATA):
     return suggestions
 
 
-def knnFAR(df,uisDATA):
+def nn_FAR(df,uisDATA):
 
-    df_relevant_columns = df.drop(columns=['id','name','release_date','year','artists', 'popularity','explicit'], axis=1)
-    
-    df_song = uisDATA.drop(columns=['track_href','analysis_url','type','id','uri','time_signature'])
-    song_df_reorder = ['valence', 'acousticness', 'danceability', 'duration_ms', 'energy', 'instrumentalness', 'key', 'liveness', 'loudness', 'mode', 'speechiness', 'tempo']
-    df_song = df_song[song_df_reorder]
+    df_relevant_columns = df.drop(columns=['id','name','release_date','year','artists','popularity','explicit','duration_ms','key','liveness','speechiness','mode'], axis=1)
+
+    df_song = uisDATA[df_relevant_columns.columns]
 
     standard = StandardScaler()
 
@@ -97,14 +95,10 @@ def knnFAR(df,uisDATA):
     X_agglo = agglo.fit_transform(X_standard)
     song_agglo = agglo.transform(song_standard)
 
-    knn_model = NearestNeighbors(n_neighbors=5)
+    knn_model = NearestNeighbors(n_neighbors=5, metric='euclidean', algorithm='ball_tree')
     knn_model.fit(X_agglo)
 
-    input_song = df_song[df_relevant_columns.columns]
-    input_song_scaled = standard.transform(input_song)
-    input_song_agglo = agglo.transform(input_song_scaled)
-
-    distances, indices = knn_model.kneighbors(input_song_agglo)
+    distances, indices = knn_model.kneighbors(song_agglo)
     recommended_songs = df.iloc[indices.flatten()][['artists', 'name', 'id']]
 
     return recommended_songs
