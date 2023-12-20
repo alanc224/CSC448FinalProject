@@ -1,12 +1,9 @@
 # CSC448 Final Project
 # Music Recommendation Model
-Descripton here, Maybe include slides here
 
-We are creating an interactive music recommendation model which is capable of taking in a song name given by a user, and then outputting a song or list of songs that that has similar characteristics based on numerical data which can represent said characteristics from our datasets. 
+We are creating an interactive music recommendation model that is capable of taking in a song (in the form of a Spotify URL) given by a user, and then outputting a list of songs that have similar characteristics based on the numerical data that represents said characteristics from our datasets. The user has the option to choose from 4 different unsupervised machine learning recommendation models (created from 2 distinct models and 4 different dimensionality reduction). More information can be found in the implementation section.
 
-The current restrictions we face in terms of functionality is that the model will only work if the inputted song also has an entry in the datasets we use, as that way we will have its characteristics labeled numerically, which we can then compare to other songs in the dataset to detect similarities. One way we can potentially help rectify this is by implementing a model which can detect similarity between text, so that if a user inputs a song name that is not recognized in the dataset, we can query the user to pick from a set of songs that have a similar name to see if they inputted the name incorrectly.
-
-Additionally, we could also potentially use the Spotify API to collect the relavant audio features we need of an inputted song, and using that as input instead of depending on the inputted song already existing in the dataset entries.
+We also implemented the Spotify API that allows us to process the input song and extract its audio attributes and features of the song to compare it to the characteristics of the songs from our dataset. Additionally, we also use the Spotify API to provide audio samples below (if available) the outputted list of song recommendations, so that users can access the song more efficiently to judge if they like it or not.
 
 <p align="center">
     <details>
@@ -32,7 +29,19 @@ Need brief description
 [Requirements](requirements.txt) - includes all of the packages used + versions  
 [Instructions](instructions.txt) - includes instructions for setting up various parts of the project
 # Implementation
-Describe how we are implementing models here
+Libraries used in our Project:
+ * **Pandas**;  used for reading the datasets, creating one of our own, and exploratory data analysis
+ * **dotenv /os**; used to create environmental variables
+ * **Spotipy**; Spotify API that allows us to show audio previews and album art covers in our application and helps us process the user input and retrieve information to use in our models
+ * **Sklearn**; using k-means and k-nearest neighbors unsupervised learning models rather than implementing the two from scratch, using the scalers from the preprocessing library, using normalize to normalize the variable values for low variance filter
+ * **Matplotlib**; this is used to create graphs for analysis purposes
+ * **Factor_analyzer**; this is used for the factor analysis portion of this report
+ * **Seaborn**; used for some visualizations
+ * **Plotly.express**; used to create most of the data visualizations
+   
+Our flask application gives the user the option to choose between 4 distinct unsupervised machine learning models: K-Nearest Neighbors, K-Means Clustering, K-NN with FAR, and K-Means with LVF. <br>
+The models used in our project are K-means clustering and K-nearest neighbors. We decided on 2 unsupervised learning models while using 4 distinct dimension reduction techniques.  The reduction techniques used are Factor Analysis,  FeatureAgglomeration Reduction, Feature Selection reduction, and Low Variance Filter. 
+
 # Resources 
 Credit any resources here
 
