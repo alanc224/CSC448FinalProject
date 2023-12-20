@@ -47,6 +47,4 @@ The models used in our project are K-means clustering and K-nearest neighbors. W
 
 # Resources 
 Credit any resources here
-
-[Music Dataset : 1950 to 2019 posted by Saurabh Shahane](https://www.kaggle.com/datasets/saurabhshahane/music-dataset-1950-to-2019)  
 [Spotify dataset posted by Vastal Mavani](https://www.kaggle.com/datasets/vatsalmavani/spotify-dataset/data)
