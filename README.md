@@ -23,7 +23,8 @@ Additionally, we could also potentially use the Spotify API to collect the relav
 </p>
 
 # Group 4 (TBD)
-[Alan Concepcion](./Code/Alan_Concepcion/)  
+[Alan Concepcion](./Code/Alan_Concepcion/) - created a K-NN model with factor analysis for the back-end; assisted in front-end development; set up the keys for the    
+                                             Spotify API; structured the report    
 [Konrad Zielinski](./Code/Konrad_Zielinski/)  
 [Anthony Zhu](./Code/Anthony_Zhu/)  
 [Daphne Tang](./Code/Daphne_Tang/)  
