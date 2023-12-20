@@ -4,6 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Login Form</title>
+
+    <script>
+        // Use JavaScript to set the selected option based on the value from Flask
+        document.addEventListener('DOMContentLoaded', function () {
+            var selectedMethod = "{{ selected_method }}";
+            if (selectedMethod) {
+                document.getElementById('Models').value = selectedMethod;
+            }
+        });
+    </script>
 </head>
 
 <center>
